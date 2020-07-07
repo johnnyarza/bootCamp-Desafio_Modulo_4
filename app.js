@@ -11,6 +11,7 @@ import { db } from './models/index.js';
     await db.mongoose.connect(db.url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useFindAndModify: false,
     });
     logger.info('Conectado ao banco de dados');
   } catch (error) {
@@ -25,11 +26,7 @@ const app = express();
 //define o dominio de origem para consumo do servico
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: 'http://localhost:8080',
-  })
-);
+app.use(cors());
 
 app.use(gradeRouter);
 

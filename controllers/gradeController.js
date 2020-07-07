@@ -1,9 +1,12 @@
 import { db } from '../models/index.js';
 import { logger } from '../config/logger.js';
+const Student = db.student;
 
 const create = async (req, res) => {
   try {
-    res.send();
+    const student = new Student(req.body);
+    const data = await Student.create(student);
+    res.send(data);
     logger.info(`POST /grade - ${JSON.stringify()}`);
   } catch (error) {
     res
@@ -18,11 +21,12 @@ const findAll = async (req, res) => {
 
   //condicao para o filtro no findAll
   var condition = name
-    ? { name: { $regex: new RegExp(name), $options: 'i' } }
+    ? { name: { $regex: new RegExp(`${name}`), $options: 'i' } }
     : {};
-
+  console.log(condition);
   try {
-    res.send();
+    const grades = await Student.find(condition);
+    res.send(grades);
     logger.info(`GET /grade`);
   } catch (error) {
     res
@@ -36,7 +40,8 @@ const findOne = async (req, res) => {
   const id = req.params.id;
 
   try {
-    res.send();
+    const data = await Student.findById(id);
+    res.send(data);
 
     logger.info(`GET /grade - ${id}`);
   } catch (error) {
@@ -55,7 +60,11 @@ const update = async (req, res) => {
   const id = req.params.id;
 
   try {
-    res.send({ message: 'Grade atualizado com sucesso' });
+    const grade = await Student.findOneAndUpdate({ _id: id }, req.body, {
+      new: true,
+    });
+
+    res.send(grade);
 
     logger.info(`PUT /grade - ${id} - ${JSON.stringify(req.body)}`);
   } catch (error) {
@@ -68,7 +77,8 @@ const remove = async (req, res) => {
   const id = req.params.id;
 
   try {
-    res.send({ message: 'Grade excluido com sucesso' });
+    const data = await Student.deleteOne({ _id: id });
+    res.send({ data });
 
     logger.info(`DELETE /grade - ${id}`);
   } catch (error) {
@@ -80,11 +90,10 @@ const remove = async (req, res) => {
 };
 
 const removeAll = async (req, res) => {
-  const id = req.params.id;
-
   try {
+    const data = await Student.deleteMany({});
     res.send({
-      message: `Grades excluidos`,
+      data,
     });
     logger.info(`DELETE /grade`);
   } catch (error) {
@@ -93,4 +102,11 @@ const removeAll = async (req, res) => {
   }
 };
 
-export default { create, findAll, findOne, update, remove, removeAll };
+export default {
+  create,
+  findAll,
+  findOne,
+  update,
+  remove,
+  removeAll,
+};
